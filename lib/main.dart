@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:newsapp/Screen/Profil.dart';
+import 'package:newsapp/Screen/videos/youtube.dart';
 
-import 'package:newsapp/Screen/profil/editProfil.dart';
-
-import 'Screen/DetailPost.dart';
-import 'Screen/Welcome.dart';
-import 'Screen/loadingPage.dart';
 import 'Screen/login.dart';
 import 'Screen/membres.dart';
 import 'Screen/register.dart';
@@ -28,9 +23,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
- 
-home: ScreenWelcome (),
-
+      home: const MyRegister(),
     );
   }
 }

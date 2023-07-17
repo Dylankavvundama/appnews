@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:http/http.dart' as http;
 
 class Membres extends StatefulWidget {
   const Membres({Key? key}) : super(key: key);
@@ -9,6 +12,27 @@ class Membres extends StatefulWidget {
 }
 
 class _MembresState extends State<Membres> {
+  List<dynamic> membre = [];
+  fetchmembre() async {
+    setState(() {});
+    const url = 'http://10.0.2.2:8000/allStory';
+    // const url = 'http:// 192.168.88.13:8000/allFondateur';
+    final uri = Uri.parse(url);
+    final reponse = await http.get(uri);
+    final resultat = jsonDecode(reponse.body);
+    membre = resultat;
+    debugPrint(reponse.body);
+    setState(() {
+      ;
+    });
+  }
+  @override
+  void initState() {
+    super.initState();
+    fetchmembre();
+  
+    //fetchmembrePHP();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

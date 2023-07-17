@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:newsapp/Screen/Colors/Colors.dart';
+import 'package:newsapp/Screen/DetailPost.dart';
 import 'package:newsapp/Screen/Profil.dart';
 import 'package:newsapp/Screen/fondateur.dart';
 import 'package:newsapp/Screen/membres.dart';
@@ -18,7 +19,8 @@ class ScreenWelcome extends StatefulWidget {
 }
 
 class _ScreenWelcomeState extends State<ScreenWelcome> {
-  List<dynamic> users = [];
+  List<dynamic> story = [];
+  List<dynamic> post = [];
   bool _isLoading = false;
   fetchLocal() async {
     setState(() {
@@ -29,7 +31,23 @@ class _ScreenWelcomeState extends State<ScreenWelcome> {
     final uri = Uri.parse(url);
     final reponse = await http.get(uri);
     final resultat = jsonDecode(reponse.body);
-    users = resultat;
+    story = resultat;
+    debugPrint(reponse.body);
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  fetchPosts() async {
+    setState(() {
+      _isLoading = true;
+    });
+    const url = 'http://10.0.2.2:8000/allpost';
+    // const url = 'http:// 192.168.88.13:8000/allFondateur';
+    final uri = Uri.parse(url);
+    final reponse = await http.get(uri);
+    final resultat = jsonDecode(reponse.body);
+    post = resultat;
     debugPrint(reponse.body);
     setState(() {
       _isLoading = false;
@@ -40,6 +58,7 @@ class _ScreenWelcomeState extends State<ScreenWelcome> {
   void initState() {
     super.initState();
     fetchLocal();
+    fetchPosts();
     //fetchLocalPHP();
   }
 
@@ -167,14 +186,21 @@ class _ScreenWelcomeState extends State<ScreenWelcome> {
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-            
-                  StoryWidget(screenH: screenH, screenW: screenW),
-              //      StoryWidget(screenH: screenH, screenW: screenW),
-                    StoryWidget(screenH: screenH, screenW: screenW),
-                  ],
-                ),
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: List.generate(
+                      story.length,
+                      (index) => StoryWidget(
+                          screenH: screenH,
+                          screenW: screenW,
+                          image:
+                              "http://10.0.2.2:8000" + story[index]['image']),
+                    ),
+                    // [
+                    //   StoryWidget(screenH: screenH, screenW: screenW),
+                    //   //      StoryWidget(screenH: screenH, screenW: screenW),
+                    //   StoryWidget(screenH: screenH, screenW: screenW),
+                    // ],
+                    ),
               ),
               SizedBox(height: screenH * 0.02),
               SingleChildScrollView(
@@ -182,34 +208,59 @@ class _ScreenWelcomeState extends State<ScreenWelcome> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    PostWidget(
-                      screenW: screenW,
-                      screenH: screenH,
-                      categories: "PLAIDOIRIE",
-                      commentaires: "10",
-                      date: "22/05/2023",
-                      description:
-                          "Le député national Patrick Munyomo a été reçu,  Jean-Michel Sama Lukonde, dans son cabinet de travail à Kinshasa, capitale de la République démocratique du Congo.",
-                      image: "assets/asset/pat2.jpg",
-                      index: 1,
-                      text: "",
-                      vues: "34k",
+                  children: List.generate(
+                    post.length,
+                    (index) => GestureDetector(
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return DetailPost(
+                            img: post[index]['image_post'],
+                          );
+                        }));
+                      },
+                      child: PostWidget(
+                        screenW: screenW,
+                        screenH: screenH,
+                        categories: "PLAIDOIRIE",
+                        commentaires: post[index]['commentaire'],
+                        date: post[index]['date_pub'],
+                        description: post[index]['description'],
+                        index: index + 1,
+                        text: "",
+                        vues: "34k",
+                        image: post[index]['image_post'],
+                      ),
                     ),
-                    PostWidget(
-                      screenW: screenW,
-                      screenH: screenH,
-                      categories: "POLITIQUE",
-                      commentaires: "10",
-                      date: "22/05/2023",
-                      description:
-                          "Le député national Patrick Munyomo a été reçu, le jeudi 26 mai 2022, par le premier ministre, Jean-Michel Sama Lukonde, dans son cabinet de travail à Kinshasa, capitale de la République démocratique du Congo.",
-                      image: "assets/asset/pat3.jpg",
-                      index: 2,
-                      text: "",
-                      vues: "34k",
-                    ),
-                  ],
+                  ),
+                  // [
+                  //   PostWidget(
+                  //     screenW: screenW,
+                  //     screenH: screenH,
+                  //     categories: "PLAIDOIRIE",
+                  //     commentaires: "10",
+                  //     date: "22/05/2023",
+                  //     description:
+                  //         "Le député national Patrick Munyomo a été reçu,  Jean-Michel Sama Lukonde, dans son cabinet de travail à Kinshasa, capitale de la République démocratique du Congo.",
+                  //     image: "assets/asset/pat2.jpg",
+                  //     index: 1,
+                  //     text: "",
+                  //     vues: "34k",
+                  //   ),
+                  //   PostWidget(
+                  //     screenW: screenW,
+                  //     screenH: screenH,
+                  //     categories: "POLITIQUE",
+                  //     commentaires: "10",
+                  //     date: "22/05/2023",
+                  //     description:
+                  //         "Le député national Patrick Munyomo a été reçu, le jeudi 26 mai 2022, par le premier ministre, Jean-Michel Sama Lukonde, dans son cabinet de travail à Kinshasa, capitale de la République démocratique du Congo.",
+                  //     image: "assets/asset/pat3.jpg",
+                  //     index: 2,
+                  //     text: "",
+                  //     vues: "34k",
+                  //   ),
+                  // ],
                 ),
               )
             ],

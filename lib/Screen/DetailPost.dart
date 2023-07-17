@@ -1,14 +1,45 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:newsapp/Screen/Welcome.dart';
 import 'package:newsapp/Screen/Widget/Post/Post.dart';
+import 'package:http/http.dart' as http;
 
 class DetailPost extends StatefulWidget {
-  const DetailPost({Key? key}) : super(key: key);
+  DetailPost({required this.img, Key? key}) : super(key: key);
+  
+  final String img;
 
   @override
   State<DetailPost> createState() => _DetailPostState();
 }
 
 class _DetailPostState extends State<DetailPost> {
+  List<dynamic> post = [];
+  bool _isLoading = false;
+
+  fetchPosts() async {
+    setState(() {
+      _isLoading = true;
+    });
+    const url = 'http://10.0.2.2:8000/allpost';
+    // const url = 'http:// 192.168.88.13:8000/allFondateur';
+    final uri = Uri.parse(url);
+    final reponse = await http.get(uri);
+    final resultat = jsonDecode(reponse.body);
+    post = resultat;
+    debugPrint(reponse.body);
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchPosts();
+    //fetchLocalPHP();
+  }
   @override
   Widget build(BuildContext context) {
     double ScreenHeight = MediaQuery.of(context).size.height;
@@ -24,8 +55,8 @@ class _DetailPostState extends State<DetailPost> {
                 Container(
                   height: ScreenHeight * 0.5,
                   width: ScreenWidth,
-                  child: Image.asset(
-                    "assets/asset/a.jpg",
+                  child: Image.network(
+                    'http://10.0.2.2:8000${widget.img}',
                     fit: BoxFit.cover,
                   ),
                 ),
@@ -36,27 +67,35 @@ class _DetailPostState extends State<DetailPost> {
                   bottom: 16,
                   child: Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Icon(
-                            Icons.arrow_left_outlined,
-                            color: Colors.white,
-                            size: 25,
-                          ),
-                          Row(
-                            children: const [
-                              Icon(
-                                Icons.share,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                            ],
-                          )
-                        ],
+                      GestureDetector(
+                        onTap: (){
+                           Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return const ScreenWelcome();
+                        }));
+                        },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Icon(
+                              Icons.arrow_left_outlined,
+                              color: Colors.white,
+                              size: 25,
+                            ),
+                            Row(
+                              children: const [
+                                Icon(
+                                  Icons.share,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                              ],
+                            )
+                          ],
+                        ),
                       ),
                       SizedBox(
                         height: ScreenHeight * 0.2,
@@ -192,22 +231,36 @@ class _DetailPostState extends State<DetailPost> {
                   SizedBox(
                     height: 19,
                   ),
-                  Column(
-                    children: [
-                      PostWidget(
-                          screenW: ScreenWidth,
-                          screenH: ScreenHeight,
-                          commentaires: 'hhhhh',
-                          date: '1/08/1990',
-                          description:
-                              'r help getting started with Flutter, view ou For he',
-                          image: 'assets/asset/david.jpg',
-                          text: '',
-                          vues: '34k',
-                          categories: 'POLITICO',
-                          index: 1)
-                    ],
+                  SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: List.generate(
+                    post.length,
+                    (index) => GestureDetector(
+                      onTap: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                          return DetailPost(img: post[index]['image_post'],);
+                        }));
+                      },
+                      child: PostWidget(
+                        screenW: ScreenWidth,
+                        screenH: ScreenHeight,
+                        categories: "PLAIDOIRIE",
+                        commentaires: post[index]['commentaire'],
+                        date: post[index]['date_pub'],
+                        description: post[index]['description'],
+                        index: index + 1,
+                        text: "",
+                        vues: "34k",
+                        image: post[index]['image_post'],
+                      ),
+                    ),
                   ),
+                ),
+              )
                 ],
               ),
             ),

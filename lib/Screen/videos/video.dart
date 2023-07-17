@@ -3,7 +3,12 @@ import 'package:video_player/video_player.dart';
 
 /// Stateful widget to fetch and then display video content.
 class VideoApp extends StatefulWidget {
-  const VideoApp({Key? key});
+  VideoApp({
+    
+    required this.img,
+    Key? key});
+
+  final String img;
 
   @override
   _VideoAppState createState() => _VideoAppState();
@@ -15,8 +20,7 @@ class _VideoAppState extends State<VideoApp> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.network(
-        'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4')
+    _controller = VideoPlayerController.network(widget.img)
       ..initialize().then((_) {
         // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
         setState(() {});
@@ -81,10 +85,9 @@ class _VideoAppState extends State<VideoApp> {
                   image: 'assets/asset/a.jpg',
                   description:
                       "Bienvenu dans notre monde sombre Bienvenu dans notre monde sombre  Bienvenu dans notre monde sombre Bienvenu dans notre monde sombre  ",
-                  text: "Bienvenu d ah",
+                  text: "Bienvenu d rah",
                   date: "25/1/2022",
                 ),
-       
                 PostVideoWidget(
                   screenHeight: screenHeight,
                   screenWidth: screenWidth,
@@ -113,7 +116,7 @@ class _VideoAppState extends State<VideoApp> {
                   date: "2/10/2023",
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -155,10 +158,10 @@ class PostVideoWidget extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Image.asset(
+            Image.network(
               '${image}',
               fit: BoxFit.cover,
-              height: screenHeight * 0.22,
+              height: screenHeight * 0.2,
               width: screenWidth / 2.5,
             ),
             Container(
